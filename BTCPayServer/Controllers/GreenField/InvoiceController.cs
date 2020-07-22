@@ -81,7 +81,8 @@ namespace BTCPayServer.Controllers.GreenField
                 return NotFound();
             }
 
-            return Ok(ToModel(invoice));
+            await _invoiceRepository.ToggleInvoiceArchival(invoiceId, true);
+            return Ok();
         }
 
         [Authorize(Policy = Policies.CanCreateInvoice,
@@ -94,8 +95,15 @@ namespace BTCPayServer.Controllers.GreenField
             {
                 return NotFound();
             }
+            if (request.Amount < 0.0m)
+            {
+                ModelState.AddModelError(nameof(request.Amount), "The amount should be 0 or more.");
+            }
 
-            var invoice = await _invoiceController.CreateInvoiceCoreRaw(new Models.CreateInvoiceRequest(), store,
+            if (!ModelState.IsValid)
+                return this.CreateValidationError(ModelState);
+            
+            var invoice = await _invoiceController.CreateInvoiceCoreRaw(FromModel(request), store,
                 Request.GetAbsoluteUri(""));
             return Ok(ToModel(invoice));
         }
