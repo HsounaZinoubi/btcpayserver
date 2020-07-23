@@ -99,24 +99,29 @@ namespace BTCPayServer.Controllers.GreenField
             {
                 return NotFound();
             }
+
             if (request.Amount < 0.0m)
             {
                 ModelState.AddModelError(nameof(request.Amount), "The amount should be 0 or more.");
             }
 
-            if (request.Checkout.PaymentMethods?.Any() is true )
+            if (request.Checkout.PaymentMethods?.Any() is true)
             {
                 for (int i = 0; i < request.Checkout.PaymentMethods.Length; i++)
                 {
                     if (!PaymentMethodId.TryParse(request.Checkout.PaymentMethods[i], out _))
                     {
-                        request.AddModelError(invoiceRequest => invoiceRequest.Checkout.PaymentMethods[i], "Invalid payment method", this);
+                        request.AddModelError(invoiceRequest => invoiceRequest.Checkout.PaymentMethods[i],
+                            "Invalid payment method", this);
                     }
                 }
             }
-            if(!string.IsNullOrEmpty(request.Customer.BuyerEmail) && !EmailValidator.IsEmail(request.Customer.BuyerEmail ))
+
+            if (!string.IsNullOrEmpty(request.Customer.BuyerEmail) &&
+                !EmailValidator.IsEmail(request.Customer.BuyerEmail))
             {
-                request.AddModelError(invoiceRequest => invoiceRequest.Customer.BuyerEmail, "Invalid email address", this);
+                request.AddModelError(invoiceRequest => invoiceRequest.Customer.BuyerEmail, "Invalid email address",
+                    this);
             }
 
             if (request.Checkout.ExpirationTime != null && request.Checkout.ExpirationTime < DateTime.Now)
@@ -125,7 +130,8 @@ namespace BTCPayServer.Controllers.GreenField
                     "Expiration time must be in the future", this);
             }
 
-            if (request.Checkout.PaymentTolerance != null && ( request.Checkout.PaymentTolerance < 0 ||  request.Checkout.PaymentTolerance > 100) )
+            if (request.Checkout.PaymentTolerance != null &&
+                (request.Checkout.PaymentTolerance < 0 || request.Checkout.PaymentTolerance > 100))
             {
                 request.AddModelError(invoiceRequest => invoiceRequest.Checkout.PaymentTolerance,
                     "PaymentTolerance can only be between 0 and 100 percent", this);
@@ -133,7 +139,7 @@ namespace BTCPayServer.Controllers.GreenField
 
             if (!ModelState.IsValid)
                 return this.CreateValidationError(ModelState);
-            
+
             var invoice = await _invoiceController.CreateInvoiceCoreRaw(FromModel(request), store,
                 Request.GetAbsoluteUri(""));
             return Ok(ToModel(invoice));
