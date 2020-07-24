@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BTCPayServer.Client.Models;
 using BTCPayServer.Data;
+using BTCPayServer.Events;
 using BTCPayServer.Logging;
 using BTCPayServer.Models.InvoicingModels;
 using BTCPayServer.Payments;
@@ -31,11 +32,12 @@ namespace BTCPayServer.Services.Invoices
         }
 
         private readonly ApplicationDbContextFactory _ContextFactory;
+        private readonly EventAggregator _eventAggregator;
         private readonly BTCPayNetworkProvider _Networks;
         private readonly CustomThreadPool _IndexerThread;
 
         public InvoiceRepository(ApplicationDbContextFactory contextFactory, string dbreezePath,
-            BTCPayNetworkProvider networks)
+            BTCPayNetworkProvider networks, EventAggregator eventAggregator)
         {
             int retryCount = 0;
 retry:
@@ -47,6 +49,7 @@ retry:
             _IndexerThread = new CustomThreadPool(1, "Invoice Indexer");
             _ContextFactory = contextFactory;
             _Networks = networks;
+            _eventAggregator = eventAggregator;
         }
 
         public InvoiceEntity CreateNewInvoice()
@@ -444,6 +447,8 @@ retry:
                 {
                     return false;
                 }
+
+                string eventName;
                 switch (status)
                 {
                     case InvoiceStatus.Complete:
@@ -451,18 +456,22 @@ retry:
                         {
                             return false;
                         }
+
+                        eventName = InvoiceEvent.MarkedCompleted;
                         break;
                     case InvoiceStatus.Invalid:
                         if (!invoiceData.GetInvoiceState().CanMarkInvalid())
                         {
                             return false;
                         }
+                        eventName = InvoiceEvent.MarkedInvalid;
                         break;
                     default:
                         return false;
                 }
                 invoiceData.Status =status.ToString().ToLowerInvariant();
                 invoiceData.ExceptionStatus = InvoiceExceptionStatus.Marked.ToString().ToLowerInvariant();
+                _eventAggregator.Publish(new InvoiceEvent(ToEntity(invoiceData), eventName));
                 await context.SaveChangesAsync().ConfigureAwait(false);
             }
 

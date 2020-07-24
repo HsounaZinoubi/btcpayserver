@@ -308,8 +308,6 @@ namespace BTCPayServer.Controllers
             foreach (var invoice in invoices)
             {
                 await _InvoiceRepository.MarkInvoiceStatus(invoice.Id, InvoiceStatus.Invalid);
-                _EventAggregator.Publish(new InvoiceEvent(await _InvoiceRepository.GetInvoice(invoice.Id), 1008,
-                    InvoiceEvent.MarkedInvalid));
             }
 
             if (redirect)
