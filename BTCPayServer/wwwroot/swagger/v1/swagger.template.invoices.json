@@ -170,7 +170,7 @@
                         "name": "storeId",
                         "in": "path",
                         "required": true,
-                        "description": "The store the payment request belongs to",
+                        "description": "The store the invoice belongs to",
                         "schema": {
                             "type": "string"
                         }
