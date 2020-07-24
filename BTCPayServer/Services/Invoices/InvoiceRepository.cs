@@ -435,29 +435,38 @@ retry:
                 await context.SaveChangesAsync().ConfigureAwait(false);
             }
         }
-        public async Task UpdatePaidInvoiceToInvalid(string invoiceId)
+        public async Task<bool> MarkInvoiceStatus(string invoiceId, InvoiceStatus status)
         {
             using (var context = _ContextFactory.CreateContext())
             {
                 var invoiceData = await context.FindAsync<Data.InvoiceData>(invoiceId).ConfigureAwait(false);
-                if (invoiceData == null || !invoiceData.GetInvoiceState().CanMarkInvalid())
-                    return;
-                invoiceData.Status = "invalid";
-                invoiceData.ExceptionStatus = "marked";
+                if (invoiceData == null)
+                {
+                    return false;
+                }
+                switch (status)
+                {
+                    case InvoiceStatus.Complete:
+                        if (!invoiceData.GetInvoiceState().CanMarkComplete())
+                        {
+                            return false;
+                        }
+                        break;
+                    case InvoiceStatus.Invalid:
+                        if (!invoiceData.GetInvoiceState().CanMarkInvalid())
+                        {
+                            return false;
+                        }
+                        break;
+                    default:
+                        return false;
+                }
+                invoiceData.Status =status.ToString().ToLowerInvariant();
+                invoiceData.ExceptionStatus = InvoiceExceptionStatus.Marked.ToString().ToLowerInvariant();
                 await context.SaveChangesAsync().ConfigureAwait(false);
             }
-        }
-        public async Task UpdatePaidInvoiceToComplete(string invoiceId)
-        {
-            using (var context = _ContextFactory.CreateContext())
-            {
-                var invoiceData = await context.FindAsync<Data.InvoiceData>(invoiceId).ConfigureAwait(false);
-                if (invoiceData == null || !invoiceData.GetInvoiceState().CanMarkComplete())
-                    return;
-                invoiceData.Status = "complete";
-                invoiceData.ExceptionStatus = "marked";
-                await context.SaveChangesAsync().ConfigureAwait(false);
-            }
+
+            return true;
         }
         public async Task<InvoiceEntity> GetInvoice(string id, bool inludeAddressData = false)
         {
