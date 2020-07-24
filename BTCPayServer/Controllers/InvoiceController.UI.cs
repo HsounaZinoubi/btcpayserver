@@ -778,13 +778,13 @@ namespace BTCPayServer.Controllers
             }
             if (newState == "invalid")
             {
-                await _InvoiceRepository.UpdateInvoiceStatus(invoiceId, InvoiceStatus.Invalid);
+                await _InvoiceRepository.MarkInvoiceStatus(invoiceId, InvoiceStatus.Invalid);
                 _EventAggregator.Publish(new InvoiceEvent(invoice, 1008, InvoiceEvent.MarkedInvalid));
                 model.StatusString = new InvoiceState("invalid", "marked").ToString();
             }
             else if (newState == "complete")
             {
-                await _InvoiceRepository.UpdateInvoiceStatus(invoiceId, InvoiceStatus.Complete);
+                await _InvoiceRepository.MarkInvoiceStatus(invoiceId, InvoiceStatus.Complete);
                 _EventAggregator.Publish(new InvoiceEvent(invoice, 2008, InvoiceEvent.MarkedCompleted));
                 model.StatusString = new InvoiceState("complete", "marked").ToString();
             }

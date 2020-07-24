@@ -281,7 +281,7 @@ namespace BTCPayServer.HostedServices
                         await UpdateInvoice(updateContext);
                         if (updateContext.Dirty)
                         {
-                            await _InvoiceRepository.UpdateInvoiceStatus(invoice.Id, invoice.Status);
+                            await _InvoiceRepository.UpdateInvoiceStatus(invoice.Id, invoice.GetInvoiceState());
                             updateContext.Events.Insert(0, new InvoiceDataChangedEvent(invoice));
                         }
 

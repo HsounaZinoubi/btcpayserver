@@ -391,15 +391,15 @@ retry:
             });
         }
 
-        public async Task UpdateInvoiceStatus(string invoiceId, InvoiceStatus invoiceState)
+        public async Task UpdateInvoiceStatus(string invoiceId, InvoiceState invoiceState)
         {
             using (var context = _ContextFactory.CreateContext())
             {
                 var invoiceData = await context.FindAsync<Data.InvoiceData>(invoiceId).ConfigureAwait(false);
                 if (invoiceData == null)
                     return;
-                invoiceData.Status = invoiceState.ToString().ToLowerInvariant();
-                invoiceData.ExceptionStatus = InvoiceExceptionStatus.Marked.ToString().ToLowerInvariant();
+                invoiceData.Status = InvoiceState.ToString(invoiceState.Status);
+                invoiceData.ExceptionStatus = InvoiceState.ToString(invoiceState.ExceptionStatus);
                 await context.SaveChangesAsync().ConfigureAwait(false);
             }
         }
