@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using BTCPayServer.Client.Models;
 using BTCPayServer.Events;
 using BTCPayServer.Logging;
 using BTCPayServer.Services.Invoices;
@@ -280,7 +281,7 @@ namespace BTCPayServer.HostedServices
                         await UpdateInvoice(updateContext);
                         if (updateContext.Dirty)
                         {
-                            await _InvoiceRepository.UpdateInvoiceStatus(invoice.Id, invoice.GetInvoiceState());
+                            await _InvoiceRepository.UpdateInvoiceStatus(invoice.Id, invoice.Status);
                             updateContext.Events.Insert(0, new InvoiceDataChangedEvent(invoice));
                         }
 

@@ -205,7 +205,7 @@ namespace BTCPayServer.Controllers.GreenField
             return await GetInvoice(storeId, invoiceId);
         }
 
-        public InvoiceData ToModel(InvoiceEntity entity)
+        private InvoiceData ToModel(InvoiceEntity entity)
         {
             return new InvoiceData()
             {
@@ -293,7 +293,7 @@ namespace BTCPayServer.Controllers.GreenField
             };
         }
 
-        public Models.CreateInvoiceRequest FromModel(CreateInvoiceRequest entity)
+        private Models.CreateInvoiceRequest FromModel(CreateInvoiceRequest entity)
         {
             return new Models.CreateInvoiceRequest()
             {
