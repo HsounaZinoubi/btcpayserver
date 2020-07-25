@@ -34,8 +34,8 @@ namespace BTCPayServer.Controllers.GreenField
 
         [Authorize(Policy = Policies.CanViewInvoices,
             AuthenticationSchemes = AuthenticationSchemes.Greenfield)]
-        [HttpGet("~/api/v1/stores/{storeId}/invoices/{invoiceId}")]
-        public async Task<IActionResult> GetInvoices(string storeId)
+        [HttpGet("~/api/v1/stores/{storeId}/invoices")]
+        public async Task<IActionResult> GetInvoices(string storeId, bool includeArchived = false)
         {
             var store = HttpContext.GetStoreData();
             if (store == null)
@@ -46,7 +46,7 @@ namespace BTCPayServer.Controllers.GreenField
             var invoices =
                 await _invoiceRepository.GetInvoices(new InvoiceQuery()
                 {
-                    StoreId = new[] {store.Id}, IncludeArchived = false
+                    StoreId = new[] {store.Id}, IncludeArchived = includeArchived
                 });
 
             return Ok(invoices.Select(ToModel));
@@ -158,7 +158,7 @@ namespace BTCPayServer.Controllers.GreenField
 
         [Authorize(Policy = Policies.CanModifyStoreSettings,
             AuthenticationSchemes = AuthenticationSchemes.Greenfield)]
-        [HttpPost("~/api/v1/stores/{storeId}/invoices/{invoiceId}")]
+        [HttpPut("~/api/v1/stores/{storeId}/invoices/{invoiceId}")]
         public async Task<IActionResult> UpdateInvoice(string storeId, string invoiceId, UpdateInvoiceRequest request)
         {
             var store = HttpContext.GetStoreData();
@@ -254,7 +254,7 @@ namespace BTCPayServer.Controllers.GreenField
                     PaymentMethods =
                         entity.GetPaymentMethods().Select(method => method.GetId().ToString()).ToArray(),
                     RedirectAutomatically = entity.RedirectAutomatically,
-                    RedirectUri = entity.RedirectURL.ToString(),
+                    RedirectUri = entity.RedirectURL?.ToString(),
                     SpeedPolicy = entity.SpeedPolicy,
                     WebHook = entity.NotificationURL
                 },
