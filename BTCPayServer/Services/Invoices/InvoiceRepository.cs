@@ -432,7 +432,7 @@ retry:
                 var invoiceData = await context.FindAsync<InvoiceData>(invoiceId).ConfigureAwait(false);
                 if (invoiceData == null || invoiceData.Archived == archived ||
                     (storeId != null &&
-                     invoiceData.StoreDataId.Equals(storeId, StringComparison.InvariantCultureIgnoreCase)))
+                     !invoiceData.StoreDataId.Equals(storeId, StringComparison.InvariantCultureIgnoreCase)))
                     return;
                 invoiceData.Archived = archived;
                 await context.SaveChangesAsync().ConfigureAwait(false);
