@@ -422,32 +422,32 @@
                         "description": "A payment link that helps pay to the payment destination"
                     },
                     "rate": {
-                        "type": "number",
+                        "type": "string",
                         "format": "decimal",
                         "description": "The rate between this payment method's currency and the invoice currency"
                     },
                     "paymentMethodPaid": {
-                        "type": "number",
+                        "type": "string",
                         "format": "decimal",
                         "description": "The amount paid by this payment method"
                     },
                     "totalPaid": {
-                        "type": "number",
+                        "type": "string",
                         "format": "decimal",
                         "description": "The total amount paid by all payment methods to the invoice, converted to this payment method's currency"
                     },
                     "due": {
-                        "type": "number",
+                        "type": "string",
                         "format": "decimal",
                         "description": "The total amount left to be paid, converted to this payment method's currency"
                     },
                     "amount": {
-                        "type": "number",
+                        "type": "string",
                         "format": "decimal",
                         "description": "The invoice amount, converted to this payment method's currency"
                     },
                     "networkFee": {
-                        "type": "number",
+                        "type": "string",
                         "format": "decimal",
                         "description": "The added merchant fee to pay for network costs of this payment method."
                     },
@@ -476,12 +476,12 @@
                         "description": "The date the payment was recorded"
                     },
                     "value": {
-                        "type": "number",
+                        "type": "string",
                         "format": "decimal",
                         "description": "The value of the payment"
                     },
                     "fee": {
-                        "type": "number",
+                        "type": "string",
                         "format": "decimal",
                         "description": "The fee paid for the payment"
                     },
@@ -517,7 +517,7 @@
                 "additionalProperties": false,
                 "properties": {
                     "amount": {
-                        "type": "number",
+                        "type": "string",
                         "format": "decimal",
                         "description": "The amount of the invoice"
                     },
@@ -584,7 +584,7 @@
                         "description": "Whether it was a physical purchase"
                     },
                     "taxIncluded": {
-                        "type": "number",
+                        "type": "string",
                         "format": "decimal",
                         "nullable": true,
                         "description": "How much tax is included in the invoice amount"
@@ -677,11 +677,11 @@
                         "description": "When the invoice expires. By default will use the store settings (which is set to 15 minutes by default)"
                     },
                     "paymentTolerance": {
-                        "type": "number",
+                        "type": "string",
                         "format": "double",
                         "nullable": true,
-                        "min": 0,
-                        "max": 100,
+                        "minimum": 0,
+                        "maximum": 100,
                         "description": "A percentage dtermining whether to count the invoice as paid when the invoice is paid within the specified margin of error"
                     }
                 }
