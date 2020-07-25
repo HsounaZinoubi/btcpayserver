@@ -104,6 +104,11 @@ namespace BTCPayServer.Controllers.GreenField
                 ModelState.AddModelError(nameof(request.Amount), "The amount should be 0 or more.");
             }
 
+            if (string.IsNullOrEmpty(request.Currency))
+            {
+                ModelState.AddModelError(nameof(request.Currency), "Currency is required");
+            }
+
             if (request.Checkout.PaymentMethods?.Any() is true)
             {
                 for (int i = 0; i < request.Checkout.PaymentMethods.Length; i++)
@@ -139,9 +144,16 @@ namespace BTCPayServer.Controllers.GreenField
             if (!ModelState.IsValid)
                 return this.CreateValidationError(ModelState);
 
-            var invoice = await _invoiceController.CreateInvoiceCoreRaw(FromModel(request), store,
-                Request.GetAbsoluteUri(""));
-            return Ok(ToModel(invoice));
+            try
+            {
+                var invoice = await _invoiceController.CreateInvoiceCoreRaw(FromModel(request), store,
+                    Request.GetAbsoluteUri(""));
+                return Ok(ToModel(invoice));
+            }
+            catch (BitpayHttpException e)
+            {
+               return this.CreateAPIError(null, e.Message);
+            }
         }
 
         [Authorize(Policy = Policies.CanModifyStoreSettings,
